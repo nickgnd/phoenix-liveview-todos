@@ -53,6 +53,7 @@ defmodule LiveTodos.Todos do
     %Todo{}
     |> Todo.changeset(attrs)
     |> Repo.insert()
+    |> broadcast_change([:todo, :created])
   end
 
   @doc """
@@ -71,6 +72,7 @@ defmodule LiveTodos.Todos do
     todo
     |> Todo.changeset(attrs)
     |> Repo.update()
+    |> broadcast_change([:todo, :updated])
   end
 
   @doc """
@@ -87,6 +89,7 @@ defmodule LiveTodos.Todos do
   """
   def delete_todo(%Todo{} = todo) do
     Repo.delete(todo)
+    |> broadcast_change([:todo, :deleted])
   end
 
   @doc """
@@ -100,5 +103,18 @@ defmodule LiveTodos.Todos do
   """
   def change_todo(%Todo{} = todo) do
     Todo.changeset(todo, %{})
+  end
+
+  # Use the module name as topic
+  @topic inspect(__MODULE__)
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(LiveTodos.PubSub, @topic)
+  end
+
+  defp broadcast_change({:ok, result}, event) do
+    Phoenix.PubSub.broadcast(LiveTodos.PubSub, @topic, {__MODULE__, event, result})
+
+    {:ok, result}
   end
 end
