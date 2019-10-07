@@ -16,12 +16,17 @@ defmodule LiveTodosWeb.TodoLive do
 
   def handle_event("add", %{"todo" => todo}, socket) do
     Todos.create_todo(todo)
+    {:noreply, socket}
+  end
 
-    {:noreply, fetch(socket)}
+  def handle_event("toggle_done", %{"id" => id}, socket) do
+    todo = Todos.get_todo!(id)
+    Todos.update_todo(todo, %{done: !todo.done})
+    {:noreply, socket}
   end
 
   # TODO: there is space for improvement here, instead of loading all the todos each time
-  #       we can diff the todos (?)
+  #       we can diff the changes (?)
   def handle_info({Todos, [:todo | _], _}, socket) do
     {:noreply, fetch(socket)}
   end
