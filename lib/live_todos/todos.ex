@@ -18,7 +18,7 @@ defmodule LiveTodos.Todos do
 
   """
   def list_todos do
-    Repo.all(Todo)
+    Todo |> order_by(asc: :inserted_at) |> Repo.all()
   end
 
   @doc """
