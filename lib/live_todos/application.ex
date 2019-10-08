@@ -11,9 +11,10 @@ defmodule LiveTodos.Application do
       # Start the Ecto repository
       LiveTodos.Repo,
       # Start the endpoint when the application starts
-      LiveTodosWeb.Endpoint
+      LiveTodosWeb.Endpoint,
       # Starts a worker by calling: LiveTodos.Worker.start_link(arg)
       # {LiveTodos.Worker, arg},
+      LiveTodosWeb.TodoLive.notification_listener()
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
